@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>World Cup 2026 Tipping Competition</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4A017;--gold-bg:#FFF8E1;--gold-border:#D4A017;--gold-text:#7A5800;
+  --green-bg:#E8F5E9;--green-border:#4CAF50;--green-text:#1B5E20;
+  --info-bg:#E3F2FD;--info-border:#2196F3;--info-text:#0D47A1;
+  --danger-bg:#FFEBEE;--danger-border:#F44336;--danger-text:#B71C1C;
+  --neutral-bg:#F5F5F5;--neutral-border:#E0E0E0;--neutral-text:#424242;
+  --white:#FFFFFF;--text-primary:#212121;--text-secondary:#616161;
+  --text-tertiary:#9E9E9E;--border:#E0E0E0;--radius:10px;--radius-sm:6px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Barlow',sans-serif;background:#F0F2F5;color:var(--text-primary);}
+.app{max-width:420px;margin:0 auto;padding:0 12px 90px;background:#F0F2F5;min-height:100vh;}
+.screen{display:none;}.screen.active{display:block;}
+.header{text-align:center;padding:20px 0 16px;}
+.header-title{font-size:24px;font-weight:600;color:var(--text-primary);margin-bottom:2px;}
+.header-sub{font-size:13px;color:var(--text-tertiary);}
+.venue-pill{display:inline-block;background:var(--gold-bg);color:var(--gold-text);font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;margin-top:6px;border:1px solid var(--gold-border);}
+.match-banner{background:var(--green-bg);border:1px solid var(--green-border);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;}
+.match-banner-label{font-size:11px;color:var(--green-text);font-weight:600;margin-bottom:4px;}
+.match-banner-teams{font-size:20px;font-weight:600;color:var(--text-primary);margin-bottom:8px;}
+.countdown-row{display:flex;gap:8px;}
+.cd-unit{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;text-align:center;min-width:52px;}
+.cd-num{font-size:22px;font-weight:600;color:var(--text-primary);display:block;line-height:1;}
+.cd-lbl{font-size:10px;color:var(--text-tertiary);}
+.tie-tip{font-size:12px;color:var(--green-text);margin-top:8px;font-weight:500;}
+.section-hdr{font-size:12px;font-weight:600;color:var(--text-tertiary);margin:14px 0 8px;text-transform:uppercase;letter-spacing:0.06em;}
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;}
+.card-warning{border-color:var(--gold-border);background:var(--gold-bg);}
+.card-info{border-color:var(--info-border);background:var(--info-bg);}
+.card-title{font-size:16px;font-weight:600;color:var(--text-primary);margin-bottom:4px;}
+.card-title-warning{color:var(--gold-text);}
+.card-title-info{color:var(--info-text);}
+.card-desc{font-size:13px;color:var(--text-secondary);margin-bottom:10px;line-height:1.5;}
+.card-desc-warning{color:var(--gold-text);}
+.card-desc-info{color:var(--info-text);}
+.pill-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
+.pill{font-size:11px;padding:3px 8px;border-radius:20px;border:1px solid var(--border);background:var(--white);color:var(--text-secondary);font-weight:500;}
+.msg{font-size:12px;line-height:1.5;padding:8px 10px;border-radius:var(--radius-sm);margin-bottom:10px;font-weight:500;}
+.msg-success{background:var(--green-bg);color:var(--green-text);border:1px solid var(--green-border);}
+.msg-warning{background:var(--gold-bg);color:var(--gold-text);border:1px solid var(--gold-border);}
+.msg-info{background:var(--info-bg);color:var(--info-text);border:1px solid var(--info-border);}
+.msg-neutral{background:var(--neutral-bg);color:var(--neutral-text);border:1px solid var(--neutral-border);}
+.msg-danger{background:var(--danger-bg);color:var(--danger-text);border:1px solid var(--danger-border);}
+.or-row{display:flex;align-items:center;gap:8px;margin:6px 0 10px;}
+.or-line{flex:1;height:1px;background:var(--border);}
+.or-text{font-size:11px;color:var(--text-tertiary);white-space:nowrap;}
+.match-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:border-color 0.15s;}
+.match-card:hover{border-color:var(--gold-border);}
+.match-card.locked{opacity:0.55;cursor:not-allowed;}
+.match-card.locked:hover{border-color:var(--border);}
+.match-card.selected{border-color:var(--gold-border);background:var(--gold-bg);}
+.match-status{font-size:11px;font-weight:600;margin-bottom:5px;}
+.status-open{color:var(--green-text);}
+.status-closing{color:var(--gold-text);}
+.status-locked{color:var(--danger-text);}
+.match-teams{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:16px;font-weight:600;margin-bottom:5px;}
+.match-vs{font-size:12px;color:var(--text-tertiary);padding:2px 6px;background:var(--neutral-bg);border-radius:var(--radius-sm);font-weight:400;}
+.match-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--text-tertiary);}
+.form-label{display:block;font-size:12px;color:var(--text-secondary);margin-bottom:5px;font-weight:600;}
+.form-input{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--white);color:var(--text-primary);font-size:14px;margin-bottom:4px;font-family:'Barlow',sans-serif;}
+.form-input:focus{outline:none;border-color:var(--gold-border);}
+.form-input.error{border-color:var(--danger-border);background:var(--danger-bg);}
+select.form-input option{background:var(--white);color:var(--text-primary);}
+.form-group{margin-bottom:12px;}
+.field-error{font-size:11px;color:var(--danger-text);margin-bottom:8px;font-weight:500;}
+.email-note{font-size:12px;color:var(--green-text);background:var(--green-bg);border:1px solid var(--green-border);border-radius:var(--radius-sm);padding:7px 10px;margin-top:4px;line-height:1.5;font-weight:500;}
+.score-block{background:var(--neutral-bg);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:12px;}
+.score-match-name{font-size:14px;font-weight:600;text-align:center;margin-bottom:12px;color:var(--text-primary);}
+.score-teams-row{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-bottom:8px;}
+.score-team-name{font-size:14px;font-weight:600;color:var(--text-primary);text-align:center;}
+.score-inputs-row{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;}
+.score-input{width:100%;padding:10px;font-size:28px;font-weight:600;text-align:center;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--white);color:var(--text-primary);font-family:'Barlow',sans-serif;}
+.score-input:focus{outline:none;border-color:var(--gold-border);}
+.score-input.error{border-color:var(--danger-border);background:var(--danger-bg);}
+.predict-inline{display:none;background:var(--gold-bg);border:1px solid var(--gold-border);border-radius:var(--radius);padding:14px;margin-top:-6px;margin-bottom:10px;}
+.predict-inline.open{display:block;}
+.match-predict-btn{width:100%;padding:10px;font-size:13px;font-weight:600;background:var(--green-bg);color:var(--green-text);border:1px solid var(--green-border);border-radius:var(--radius-sm);cursor:pointer;margin-top:8px;text-align:center;}
+.match-predict-btn:hover{filter:brightness(0.95);}
+.match-locked-msg{font-size:12px;color:var(--danger-text);font-weight:500;margin-top:6px;}
+.match-soon-msg{font-size:12px;color:var(--text-tertiary);margin-top:6px;line-height:1.4;}
+.date-group-hdr{font-size:13px;font-weight:600;color:var(--text-secondary);margin:16px 0 8px;padding:6px 10px;background:var(--neutral-bg);border-radius:var(--radius-sm);border-left:3px solid var(--gold-border);}
+.submitted-badge{background:var(--green-bg);color:var(--green-text);border:1px solid var(--green-border);border-radius:var(--radius-sm);padding:8px 12px;font-size:12px;font-weight:600;margin-top:8px;text-align:center;}
+.score-dash{text-align:center;font-size:22px;color:var(--text-tertiary);font-weight:300;}
+.scoring-guide{background:var(--neutral-bg);border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:12px;}
+.scoring-guide-title{font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;}
+.scoring-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text-secondary);}
+.scoring-row:last-child{border-bottom:none;}
+.scoring-pts{font-weight:600;color:var(--text-primary);}
+.tie-box{background:var(--gold-bg);border:1px solid var(--gold-border);border-radius:var(--radius);padding:12px;margin-bottom:12px;font-size:12px;color:var(--gold-text);line-height:1.6;}
+.tie-box-title{font-weight:600;margin-bottom:4px;font-size:13px;}
+.lb-tabs{display:flex;gap:4px;background:var(--neutral-bg);border:1px solid var(--border);border-radius:var(--radius);padding:4px;margin-bottom:12px;}
+.lb-tab{flex:1;padding:9px;text-align:center;border-radius:var(--radius-sm);font-size:13px;font-weight:500;color:var(--text-secondary);cursor:pointer;border:1px solid transparent;background:none;transition:all 0.15s;font-family:'Barlow',sans-serif;}
+.lb-tab.active{background:var(--gold-bg);color:var(--gold-text);border-color:var(--gold-border);font-weight:600;}
+.lb-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:6px;}
+.lb-row.top1{background:var(--gold-bg);border-color:var(--gold-border);}
+.lb-row.top2{background:#FAFAFA;border-color:#BDBDBD;}
+.lb-row.top3{background:#FFF8F0;border-color:#FFAB40;}
+.lb-pos{font-size:18px;width:28px;text-align:center;}
+.lb-name{flex:1;font-size:14px;font-weight:600;color:var(--text-primary);}
+.lb-pts{font-size:20px;font-weight:600;color:var(--text-primary);}
+.lb-pts-lbl{font-size:10px;color:var(--text-tertiary);text-align:right;}
+.lb-match-tag{background:var(--info-bg);border:1px solid var(--info-border);border-radius:var(--radius-sm);padding:7px 10px;margin-bottom:10px;font-size:12px;color:var(--info-text);font-weight:600;}
+.rule-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;}
+.rule-card-title{font-size:15px;font-weight:600;color:var(--text-primary);margin-bottom:10px;}
+.rule-item{display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text-secondary);line-height:1.5;}
+.rule-item:last-child{border-bottom:none;}
+.rule-dot{color:var(--gold-text);font-weight:700;flex-shrink:0;}
+.rule-pts-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.rule-pts-row:last-child{border-bottom:none;}
+.rule-pts-val{font-weight:600;color:var(--text-primary);}
+.success-card{background:var(--green-bg);border:1px solid var(--green-border);border-radius:var(--radius);padding:24px 16px;text-align:center;margin-bottom:12px;}
+.success-title{font-size:22px;font-weight:600;color:var(--green-text);margin-bottom:6px;}
+.success-desc{font-size:13px;color:var(--green-text);line-height:1.5;}
+.submit-time{display:inline-block;background:var(--gold-bg);color:var(--gold-text);border:1px solid var(--gold-border);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;margin-top:8px;}
+.divider{height:1px;background:var(--border);margin:12px 0;}
+.loading{text-align:center;padding:20px;font-size:13px;color:var(--text-tertiary);}
+.deadline-banner{background:var(--danger-bg);border:1px solid var(--danger-border);border-radius:var(--radius);padding:12px 14px;margin-bottom:12px;font-size:13px;color:var(--danger-text);line-height:1.5;}
+.deadline-banner strong{display:block;font-weight:600;margin-bottom:2px;}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:420px;background:var(--white);border-top:1px solid var(--border);display:flex;z-index:100;box-shadow:0 -2px 8px rgba(0,0,0,0.08);}
+.nav-btn{flex:1;padding:10px 4px;text-align:center;cursor:pointer;border:none;background:none;color:var(--text-tertiary);font-size:10px;font-weight:500;font-family:'Barlow',sans-serif;transition:all 0.15s;}
+.nav-btn.active{color:var(--gold-text);background:var(--gold-bg);}
+.nav-icon{font-size:20px;display:block;margin-bottom:2px;}
+button{font-family:'Barlow',sans-serif;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--white);color:var(--text-primary);cursor:pointer;font-weight:500;transition:all 0.15s;}
+button:hover{filter:brightness(0.95);}
+.btn-primary{background:var(--gold-bg)!important;color:var(--gold-text)!important;border-color:var(--gold-border)!important;font-weight:600!important;}
+.btn-success{background:var(--green-bg)!important;color:var(--green-text)!important;border-color:var(--green-border)!important;font-weight:600!important;}
+.btn-back{background:var(--neutral-bg);border-color:var(--neutral-border);color:var(--neutral-text);}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="header-title">⚽ World Cup 2026</div>
+    <div class="header-sub">Tipping Competition</div>
+    <div class="venue-pill">📍 The Crown Hotel</div>
+  </div>
+
+  <!-- HOME -->
+  <div class="screen active" id="s-home">
+    <div id="next-match-banner" class="match-banner" style="display:none">
+      <div class="match-banner-label">⚡ Next match — predictions open</div>
+      <div class="match-banner-teams" id="next-match-name">Loading...</div>
+      <div class="countdown-row">
+        <div class="cd-unit"><span class="cd-num" id="cd-h">--</span><span class="cd-lbl">hrs</span></div>
+        <div class="cd-unit"><span class="cd-num" id="cd-m">--</span><span class="cd-lbl">min</span></div>
+        <div class="cd-unit"><span class="cd-num" id="cd-s">--</span><span class="cd-lbl">sec</span></div>
+      </div>
+      <div class="tie-tip">⏰ Submit early — earlier entries win tiebreakers!</div>
+    </div>
+    <div id="state-open">
+      <div class="card card-warning">
+        <div class="card-title card-title-warning">🏆 Tournament Competition</div>
+        <div class="card-desc card-desc-warning">39-day full tournament — compete from first match to the Final</div>
+        <div class="pill-row">
+          <span class="pill">📅 39 days</span><span class="pill">🎯 Register once</span>
+          <span class="pill">🏆 Big prize</span><span class="pill">⚽ Auto-enters Per Match</span>
+        </div>
+        <div class="msg msg-warning">🔔 Registration closes at first kickoff — June 12, 2026. Register now to lock in your spot and Tournament Winner prediction!</div>
+        <button class="btn-primary" onclick="go('s-register','n-register')" style="width:100%;padding:12px;font-size:15px">Register now — free to join →</button>
+      </div>
+      <div class="or-row"><div class="or-line"></div><div class="or-text">Already registered? Or just here for today?</div><div class="or-line"></div></div>
+      <div class="card card-info">
+        <div class="card-title card-title-info">⚽ Per Match Competition</div>
+        <div class="card-desc card-desc-info">Predict any match and win prizes — no account needed</div>
+        <div class="pill-row">
+          <span class="pill">🚀 No account needed</span><span class="pill">🎁 Win prizes every match</span>
+          <span class="pill">⏱ Join any time</span><span class="pill">📧 Email optional</span>
+        </div>
+        <div class="msg msg-success">✅ Already registered for the Tournament? Your predictions automatically count in the Per Match Competition too!</div>
+        <div class="msg msg-neutral">📝 Just your name to enter — add your email to get match results and exclusive offers from The Crown Hotel.</div>
+        <button class="btn-success" onclick="go('s-predict','n-predict')" style="width:100%;padding:12px;font-size:15px">Predict a match and win →</button>
+      </div>
+    </div>
+    <div id="state-closed" style="display:none">
+      <div class="deadline-banner"><strong>🔒 Tournament Competition registration closed</strong>Registration closed at first kickoff on June 12. The 39-day competition is now underway!</div>
+      <div class="card">
+        <div class="card-title">🏆 Submit your tournament prediction</div>
+        <div class="card-desc">Already registered? Submit your match predictions here.</div>
+        <div class="msg msg-warning">One submission counts for both the Tournament AND Per Match Competition automatically!</div>
+        <button class="btn-primary" onclick="go('s-predict','n-predict')" style="width:100%;padding:12px;font-size:15px">Submit my tournament prediction →</button>
+      </div>
+      <div class="or-row"><div class="or-line"></div><div class="or-text">Missed the tournament comp?</div><div class="or-line"></div></div>
+      <div class="card card-info">
+        <div class="card-title card-title-info">⚽ Per Match Competition</div>
+        <div class="card-desc card-desc-info">No worries — you can still win great prizes every match!</div>
+        <div class="msg msg-success">🎉 Missed the 39-day Tournament Competition? No worries! Just your name to enter — add your email to get match results and exclusive offers from The Crown Hotel!</div>
+        <button class="btn-success" onclick="go('s-predict','n-predict')" style="width:100%;padding:12px;font-size:15px">Jump in and win →</button>
+      </div>
+    </div>
+    <div class="section-hdr">Today's matches</div>
+    <div id="todays-matches"><div class="loading">⏳ Loading matches...</div></div>
+  </div>
+
+  <!-- PREDICT -->
+  <div class="screen" id="s-predict">
+    <button class="btn-back" onclick="go('s-home','n-home')" style="margin:12px 0;padding:8px 14px;font-size:13px">← Back to home</button>
+
+    <!-- Player type — shown once at top, applies to all match predictions -->
+    <div class="card" style="margin-bottom:12px">
+      <div style="font-size:14px;font-weight:600;margin-bottom:10px;color:var(--text-primary)">Who are you?</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <button id="pt-guest" onclick="switchType('guest')" style="flex:1;padding:10px;font-size:13px">👤 Quick entry</button>
+        <button id="pt-reg" onclick="switchType('reg')" style="flex:1;padding:10px;font-size:13px">🏆 Tournament player</button>
+      </div>
+      <div id="player-fields"></div>
+      <div class="tie-box" style="margin-bottom:0">
+        <div class="tie-box-title">⏰ Tiebreaker rules</div>
+        🥇 1st: Closest total goals predicted &nbsp; 🥈 2nd: Earliest submission wins<br>
+        <span style="opacity:0.8;font-size:11px">Submit as early as possible — every minute counts!</span>
+      </div>
+    </div>
+
+    <!-- Match list grouped by date with inline prediction -->
+    <div id="predict-match-list"></div>
+  </div>
+
+  <!-- REGISTER -->
+  <div class="screen" id="s-register">
+    <button class="btn-back" onclick="go('s-home','n-home')" style="margin:12px 0;padding:8px 14px;font-size:13px">← Back to home</button>
+    <div class="card">
+      <div style="font-size:18px;font-weight:600;margin-bottom:4px">Join the Tournament</div>
+      <div style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;line-height:1.5">Register once for the full 39-day World Cup competition. Registration closes at the first kickoff on <strong>June 12, 2026</strong>.</div>
+      <div class="msg msg-warning" style="margin-bottom:14px">⚽ Bonus: Tournament registration automatically enters you in the Per Match Competition too!</div>
+      <div class="form-group">
+        <label class="form-label">Full Name *</label>
+        <input type="text" id="reg-name" class="form-input" placeholder="Enter your full name">
+        <div class="field-error" id="reg-name-error" style="display:none">⚠️ Please enter your full name</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email (optional)</label>
+        <input type="email" id="reg-email" class="form-input" placeholder="your@email.com">
+        <div class="email-note">📧 Add your email to receive daily leaderboard updates and exclusive offers from The Crown Hotel</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone (optional)</label>
+        <input type="tel" id="reg-phone" class="form-input" placeholder="0400 000 000">
+      </div>
+      <div class="divider"></div>
+      <div class="form-group">
+        <label class="form-label">🏆 Who will win the 2026 World Cup? *</label>
+        <select id="reg-winner" class="form-input">
+          <option value="">Select a country...</option>
+          <option>Algeria</option><option>Argentina</option><option>Australia</option><option>Austria</option><option>Belgium</option><option>Bosnia & Herzegovina</option><option>Brazil</option><option>Canada</option><option>Cape Verde Islands</option><option>Colombia</option><option>Congo DR</option><option>Croatia</option><option>Curaçao</option><option>Czech Republic</option><option>Ecuador</option><option>Egypt</option><option>England</option><option>France</option><option>Germany</option><option>Ghana</option><option>Haiti</option><option>Iran</option><option>Iraq</option><option>Ivory Coast</option><option>Japan</option><option>Jordan</option><option>Mexico</option><option>Morocco</option><option>Netherlands</option><option>New Zealand</option><option>Norway</option><option>Panama</option><option>Paraguay</option><option>Portugal</option><option>Qatar</option><option>Saudi Arabia</option><option>Scotland</option><option>Senegal</option><option>South Africa</option><option>South Korea</option><option>Spain</option><option>Sweden</option><option>Switzerland</option><option>Tunisia</option><option>Türkiye</option><option>USA</option><option>Uruguay</option><option>Uzbekistan</option>
+        </select>
+        <div class="field-error" id="reg-winner-error" style="display:none">⚠️ Please select your Tournament Winner prediction</div>
+      </div>
+      <div class="msg msg-neutral" style="margin-bottom:14px">🔒 Your Tournament Winner prediction is locked after registration and cannot be changed</div>
+      <div style="margin-bottom:14px">
+        <label style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--text-secondary);cursor:pointer;line-height:1.5">
+          <input type="checkbox" id="reg-consent" style="margin-top:2px;flex-shrink:0">
+          I agree to receive updates and offers from The Crown Hotel (unsubscribe anytime)
+        </label>
+      </div>
+      <button class="btn-primary" onclick="submitRegistration()" style="width:100%;padding:13px;font-size:16px">Register and lock in my pick 🔒</button>
+    </div>
+  </div>
+
+  <!-- STANDINGS -->
+  <div class="screen" id="s-standings">
+    <div class="section-hdr" style="margin-top:12px">Live standings</div>
+    <div class="lb-tabs">
+      <button class="lb-tab active" id="lb-t" onclick="switchLb('t')">🏆 Tournament</button>
+      <button class="lb-tab" id="lb-p" onclick="switchLb('p')">⚽ Per match</button>
+    </div>
+    <div id="lb-tournament"><div class="loading">⏳ Loading standings...</div></div>
+    <div id="lb-permatch" style="display:none">
+      <div class="lb-match-tag">⚽ <span id="current-match-label">Next upcoming match</span></div>
+      <div id="lb-permatch-rows"><div class="msg msg-neutral">Per match results will appear here after the first match is played.</div></div>
+    </div>
+  </div>
+
+  <!-- RULES -->
+  <div class="screen" id="s-rules">
+    <div class="section-hdr" style="margin-top:12px">Competition rules</div>
+    <div class="rule-card">
+      <div class="rule-card-title">🏆 Tournament Competition</div>
+      <div class="rule-item"><span class="rule-dot">›</span><span>Open to anyone who registers before the first kickoff on <strong>June 12, 2026</strong>.</span></div>
+      <div class="rule-item"><span class="rule-dot">›</span><span>Register once — your Tournament Winner prediction is locked at registration and cannot be changed.</span></div>
+      <div class="rule-item"><span class="rule-dot">›</span><span>Submit match score predictions before each kickoff. Predictions close when a match begins.</span></div>
+      <div class="rule-item"><span class="rule-dot">›</span><span>Points accumulate across all 104 matches. Most points after the Final wins.</span></div>
+      <div class="rule-item"><span class="rule-dot">›</span><span>Tournament players are automatically entered in the Per Match Competition.</span></div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-card-title">⚽ Per Match Competition</div>
+      <div class="rule-item"><span class="rule-dot">›</span><span>Open to everyone — no registration required. Just your name to enter.</span></div>
+      <div class="rule-item"><span class="rule-dot">›</span><span>Predict the score of any match before kickoff. Enter as many matches as you like.</span></div>
+      <div class="rule-item"><span class="rule-dot">›</span><span>Each match has its own leaderboard. Winner announced after the final whistle.</span></div>
+      <div class="rule-item"><span class="rule-dot">›</span><span>Join for any match at any time during the tournament.</span></div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-card-title">📊 Scoring system</div>
+      <div class="rule-pts-row"><span>Exact score</span><span class="rule-pts-val">5 pts</span></div>
+      <div class="rule-pts-row"><span>Correct result (win/draw/loss)</span><span class="rule-pts-val">2 pts</span></div>
+      <div class="rule-pts-row"><span>Correct goal margin</span><span class="rule-pts-val">1 pt</span></div>
+      <div class="rule-pts-row"><span>Wrong result</span><span class="rule-pts-val">0 pts</span></div>
+      <div class="rule-pts-row"><span>Tournament Winner correct</span><span class="rule-pts-val">10 pts</span></div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-card-title">⏰ Tiebreaker rules</div>
+      <div class="rule-item"><span class="rule-dot">1</span><span><strong>Closest total goals predicted</strong> — whoever predicted total goals most accurately wins.</span></div>
+      <div class="rule-item"><span class="rule-dot">2</span><span><strong>Earliest submission</strong> — if still tied, whoever submitted earliest wins.</span></div>
+      <div class="msg msg-warning" style="margin-top:8px">💡 Pro tip: Submit as early as possible — every minute counts in a tiebreaker!</div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-card-title">📋 General rules</div>
+      <div class="rule-item"><span class="rule-dot">›</span><span>All predictions must be submitted before kickoff. Late entries will not be accepted.</span></div>
+      <div class="rule-item"><span class="rule-dot">›</span><span>Leaderboards refresh within 60 minutes of full time.</span></div>
+      <div class="rule-item"><span class="rule-dot">›</span><span>The venue reserves the right to determine prize winners in any dispute.</span></div>
+      <div class="rule-item"><span class="rule-dot">›</span><span>By entering you agree to receive communications from The Crown Hotel. Unsubscribe anytime.</span></div>
+    </div>
+  </div>
+
+  <!-- PREDICT SUCCESS -->
+  <div class="screen" id="s-success">
+    <div class="success-card" style="margin-top:12px">
+      <div style="font-size:48px;margin-bottom:8px">✅</div>
+      <div class="success-title">Prediction locked in!</div>
+      <div class="success-desc">Your prediction has been submitted. Results announced after the final whistle!</div>
+      <div class="submit-time">⏰ Submitted at <span id="submit-time">--:-- --</span></div>
+    </div>
+    <div class="tie-box">
+      <div class="tie-box-title">Your tiebreaker position</div>
+      You submitted <strong id="mins-before">--</strong> before kickoff — <span id="tie-rating">great position!</span>
+    </div>
+    <div class="card" style="text-align:center">
+      <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;line-height:1.5">Want to compete in the full 39-day Tournament Competition?</div>
+      <button class="btn-primary" onclick="go('s-register','n-register')" style="width:100%;padding:12px;font-size:15px">Join Tournament Competition →</button>
+    </div>
+    <button class="btn-back" onclick="go('s-home','n-home')" style="width:100%;padding:12px;font-size:15px;margin-top:8px">Back to home 🏠</button>
+  </div>
+
+  <!-- REGISTER SUCCESS -->
+  <div class="screen" id="s-reg-success">
+    <div class="success-card" style="margin-top:12px">
+      <div style="font-size:48px;margin-bottom:8px">🏆</div>
+      <div class="success-title">You're registered!</div>
+      <div class="success-desc">Your spot is locked in. Your Tournament Winner prediction cannot be changed. Good luck!</div>
+    </div>
+    <div class="msg msg-success">⚽ You're automatically entered in the Per Match Competition too — predict any match to earn extra prizes!</div>
+    <button class="btn-success" onclick="go('s-predict','n-predict')" style="width:100%;padding:12px;font-size:15px;margin-top:8px">Predict today's matches →</button>
+    <button class="btn-back" onclick="go('s-home','n-home')" style="width:100%;padding:12px;font-size:15px;margin-top:8px">Back to home 🏠</button>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <button class="nav-btn active" id="n-home" onclick="go('s-home','n-home')"><span class="nav-icon">🏠</span>Home</button>
+  <button class="nav-btn" id="n-predict" onclick="go('s-predict','n-predict')"><span class="nav-icon">⚽</span>Predict</button>
+  <button class="nav-btn" id="n-register" onclick="go('s-register','n-register')"><span class="nav-icon">🎯</span>Register</button>
+  <button class="nav-btn" id="n-standings" onclick="go('s-standings','n-standings')"><span class="nav-icon">📊</span>Standings</button>
+  <button class="nav-btn" id="n-rules" onclick="go('s-rules','n-rules')"><span class="nav-icon">📋</span>Rules</button>
+</div>
+
+<script>
+// ── Your Apps Script Web App URL — serves data with CORS support ──
+const API = 'https://script.google.com/macros/s/AKfycbzTJh8EdXKiNMo3EsOMBVLRglS4dGY6AaEBer-IYhQuETfIDulIO-x9ob-XFuByKBtnLw/exec';
+
+const navIds=['n-home','n-predict','n-register','n-standings','n-rules'];
+const scrIds=['s-home','s-predict','s-register','s-standings','s-rules','s-success','s-reg-success'];
+let allFixtures=[],selectedMatch=null,nextMatch=null,countdownInterval=null,currentPlayerType='guest';
+
+function go(screenId,navId){
+  scrIds.forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('active');});
+  const s=document.getElementById(screenId);if(s)s.classList.add('active');
+  navIds.forEach(id=>{const el=document.getElementById(id);if(el){el.classList.remove('active');el.style.background='';el.style.color='';}});
+  if(navId){const n=document.getElementById(navId);if(n)n.classList.add('active');}
+  if(screenId==='s-predict')renderPredictMatchList();
+  if(screenId==='s-standings'){switchLb('t');loadLeaderboard();}
+}
+
+function parseKickoff(dateStr,timeStr){
+  if(!dateStr||!timeStr)return null;
+  try{
+    const d=String(dateStr).trim();
+    const t=String(timeStr).trim();
+    // Format from Apps Script: "2026-06-12 00:00:00" + "5:00 AM"
+    // Extract just the date part (first 10 chars: yyyy-MM-dd)
+    const datePart=d.substring(0,10);
+    // Build a clean ISO-like string
+    const dt=new Date(datePart+'T'+convertTo24(t));
+    if(!isNaN(dt.getTime()))return dt;
+    // Fallback: DD/MM/YYYY
+    const parts=d.split('/');
+    if(parts.length===3){
+      const dt2=new Date(`${parts[2].substring(0,4)}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}T${convertTo24(t)}`);
+      if(!isNaN(dt2.getTime()))return dt2;
+    }
+    return null;
+  }catch(e){return null;}
+}
+
+function convertTo24(timeStr){
+  // Convert "5:00 AM" or "11:00 PM" to "05:00:00" or "23:00:00"
+  try{
+    const t=String(timeStr).trim().toUpperCase();
+    const isPM=t.includes('PM');
+    const isAM=t.includes('AM');
+    const timePart=t.replace('AM','').replace('PM','').trim();
+    const parts=timePart.split(':');
+    let hours=parseInt(parts[0]);
+    const mins=parts[1]?parts[1].padStart(2,'0'):'00';
+    if(isPM&&hours!==12)hours+=12;
+    if(isAM&&hours===12)hours=0;
+    return hours.toString().padStart(2,'0')+':'+mins+':00';
+  }catch(e){return'00:00:00';}
+}
+
+function formatMatchDate(dateStr){
+  // Display as "12 June 2026"
+  try{
+    const d=String(dateStr).trim().substring(0,10);
+    const dt=new Date(d+'T00:00:00');
+    if(isNaN(dt.getTime()))return dateStr;
+    return dt.toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'});
+  }catch(e){return dateStr;}
+}
+
+function isToday(dateStr){
+  if(!dateStr)return false;
+  try{
+    const now=new Date();
+    const d=String(dateStr).trim().substring(0,10);
+    const dt=new Date(d+'T00:00:00');
+    return dt.getDate()===now.getDate()&&dt.getMonth()===now.getMonth()&&dt.getFullYear()===now.getFullYear();
+  }catch(e){return false;}
+}
+
+function getMatchStatus(ko){
+  if(!ko)return'unknown';
+  const diff=ko-new Date();
+  if(diff<0)return'locked';
+  if(diff<30*60*1000)return'closing';
+  return'open';
+}
+
+function matchCardHTML(f){
+  const ko=parseKickoff(f['Date'],f['Kickoff Time']);
+  const status=getMatchStatus(ko);
+  const statusMap={
+    open:'<div class="match-status status-open">⚡ Open — predict now</div>',
+    closing:'<div class="match-status status-closing">⏰ Closing soon — submit now!</div>',
+    locked:'<div class="match-status status-locked">🔒 Predictions closed</div>',
+    unknown:''
+  };
+  const timeStr=ko?ko.toLocaleTimeString([],{hour:'numeric',minute:'2-digit',hour12:true}).toUpperCase():(f['Kickoff Time']||'');
+  const dateStr=formatMatchDate(f['Date']);
+  const locked=status==='locked';
+  const click=!locked?`onclick="go('s-predict','n-predict')"`:'' ;
+  const cls=locked?'match-card locked':'match-card';
+  return`<div class="${cls}" ${click}>${statusMap[status]}<div class="match-teams"><span>${f['Home Team']}</span><span class="match-vs">vs</span><span>${f['Away Team']}</span></div><div class="match-meta"><span>🕐 ${timeStr} · ${dateStr}</span><span>${f['Group']||f['Round']||''}</span></div></div>`;
+}
+
+async function loadFixtures(){
+  try{
+    const res=await fetch(API+'?sheet=Fixtures');
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    allFixtures=data.filter(r=>r['Home Team']&&r['Away Team']);
+    renderTodaysMatches();
+    findNextMatch();
+  }catch(e){
+    document.getElementById('todays-matches').innerHTML='<div class="msg msg-danger">⚠️ Could not load fixtures. Error: '+e.message+'<br><br>Please check your Apps Script is deployed correctly and try refreshing.</div>';
+    console.error('Fixtures error:',e);
+  }
+}
+
+function renderTodaysMatches(){
+  const today=allFixtures.filter(f=>isToday(f['Date']));
+  const container=document.getElementById('todays-matches');
+  const sectionHdr=document.querySelector('.section-hdr');
+  if(today.length===0){
+    const upcoming=allFixtures.map(f=>({...f,ko:parseKickoff(f['Date'],f['Kickoff Time'])}))
+      .filter(f=>f.ko&&f.ko>new Date()).sort((a,b)=>a.ko-b.ko).slice(0,3);
+    if(upcoming.length>0){
+      if(sectionHdr)sectionHdr.textContent='Upcoming matches';
+      container.innerHTML=upcoming.map(f=>matchCardHTML(f)).join('');
+    }else{
+      if(sectionHdr)sectionHdr.textContent='Today\'s matches';
+      container.innerHTML='<div class="msg msg-neutral">No upcoming matches found. The tournament may not have started yet.</div>';
+    }
+    return;
+  }
+  if(sectionHdr)sectionHdr.textContent='Today\'s matches';
+  container.innerHTML=today.map(f=>matchCardHTML(f)).join('');
+}
+
+function findNextMatch(){
+  const now=new Date();
+  const upcoming=allFixtures.map(f=>({...f,ko:parseKickoff(f['Date'],f['Kickoff Time'])}))
+    .filter(f=>f.ko&&f.ko>now).sort((a,b)=>a.ko-b.ko);
+  if(upcoming.length>0){
+    nextMatch=upcoming[0];
+    document.getElementById('next-match-banner').style.display='block';
+    document.getElementById('next-match-name').textContent=nextMatch['Home Team']+' vs '+nextMatch['Away Team'];
+    document.getElementById('current-match-label').textContent=nextMatch['Home Team']+' vs '+nextMatch['Away Team'];
+    startCountdown(nextMatch.ko);
+  }
+  const regClosed=now>new Date('2026-06-12T00:00:00');
+  document.getElementById('state-open').style.display=regClosed?'none':'block';
+  document.getElementById('state-closed').style.display=regClosed?'block':'none';
+}
+
+function startCountdown(kickoff){
+  if(countdownInterval)clearInterval(countdownInterval);
+  function update(){
+    const diff=kickoff-new Date();
+    if(diff<=0){clearInterval(countdownInterval);renderTodaysMatches();return;}
+    document.getElementById('cd-h').textContent=Math.floor(diff/3600000).toString().padStart(2,'0');
+    document.getElementById('cd-m').textContent=Math.floor((diff%3600000)/60000).toString().padStart(2,'0');
+    document.getElementById('cd-s').textContent=Math.floor((diff%60000)/1000).toString().padStart(2,'0');
+  }
+  update();countdownInterval=setInterval(update,1000);
+}
+
+function renderPredictMatchList(){
+  const now=new Date();
+  const container=document.getElementById('predict-match-list');
+
+  if(allFixtures.length===0){
+    container.innerHTML='<div class="msg msg-warning">⏳ Loading matches... please wait.</div>';
+    setTimeout(renderPredictMatchList,2000);
+    return;
+  }
+
+  // Get all future matches + matches from today
+  const relevant=allFixtures
+    .map(f=>({...f,ko:parseKickoff(f['Date'],f['Kickoff Time'])}))
+    .filter(f=>f.ko)
+    .sort((a,b)=>a.ko-b.ko);
+
+  // Find the two upcoming matchdays
+  const futureDates=[...new Set(
+    relevant
+      .filter(f=>f.ko>now)
+      .map(f=>f['Date'].substring(0,10))
+  )].slice(0,2);
+
+  // Also include today if matches are locked (already kicked off today)
+  const todayStr=now.toISOString().substring(0,10);
+  if(!futureDates.includes(todayStr)){
+    const todayMatches=relevant.filter(f=>f['Date'].substring(0,10)===todayStr);
+    if(todayMatches.length>0) futureDates.unshift(todayStr);
+  }
+
+  if(futureDates.length===0){
+    container.innerHTML='<div class="msg msg-neutral">No upcoming matches to predict. Check back soon!</div>';
+    return;
+  }
+
+  let html='';
+  futureDates.forEach(dateKey=>{
+    const dayMatches=relevant.filter(f=>f['Date'].substring(0,10)===dateKey);
+    const displayDate=formatMatchDate(dateKey+' 00:00:00');
+    html+=`<div class="date-group-hdr">📅 ${displayDate}</div>`;
+    dayMatches.forEach(f=>{
+      const diff=f.ko-now;
+      const tournamentStart=new Date('2026-06-12T00:00:00');
+      const tournamentStarted=now>=tournamentStart;
+      const isOpen=diff>0&&(!tournamentStarted||diff<=24*60*60*1000);
+      const isLocked=diff<=0;
+      const isSoon=tournamentStarted&&diff>24*60*60*1000;
+      const timeStr=f.ko.toLocaleTimeString([],{hour:'numeric',minute:'2-digit',hour12:true}).toUpperCase();
+      const id='match-'+f['Match ID'];
+      const inlineId='inline-'+f['Match ID'];
+
+      let statusBadge='';
+      let actionBtn='';
+
+      if(isLocked){
+        statusBadge='<div class="match-status status-locked">🔒 Predictions closed</div>';
+        actionBtn='';
+      } else if(isOpen){
+        statusBadge='<div class="match-status status-open">⚡ Open for prediction</div>';
+        actionBtn=`<button class="match-predict-btn" onclick="toggleInline('${f['Match ID']}')">⚽ Tap to predict this match</button>`;
+      } else {
+        // Calculate when it opens
+        const opensAt=new Date(f.ko.getTime()-24*60*60*1000);
+        const opensDisplay=opensAt.toLocaleDateString('en-AU',{day:'numeric',month:'long'})+' at '+opensAt.toLocaleTimeString([],{hour:'numeric',minute:'2-digit',hour12:true}).toUpperCase();
+        statusBadge='<div class="match-status" style="color:var(--text-tertiary)">🕐 Not yet open</div>';
+        actionBtn=`<div class="match-soon-msg">Predictions open 24 hours before kickoff — ${opensDisplay}</div>`;
+      }
+
+      html+=`
+        <div class="match-card" id="${id}" style="margin-bottom:4px;cursor:${isOpen?'pointer':'default'}" ${isOpen?`onclick="toggleInline('${f['Match ID']}')"`:''}>
+          ${statusBadge}
+          <div class="match-teams">
+            <span>${f['Home Team']}</span>
+            <span class="match-vs">vs</span>
+            <span>${f['Away Team']}</span>
+          </div>
+          <div class="match-meta">
+            <span>🕐 ${timeStr}</span>
+            <span>${f['Group']||f['Round']||''}</span>
+          </div>
+          ${actionBtn}
+        </div>
+        <div class="predict-inline" id="${inlineId}">
+          <div style="font-size:14px;font-weight:600;margin-bottom:10px;color:var(--gold-text)">${f['Home Team']} vs ${f['Away Team']}</div>
+          <div class="score-teams-row">
+            <div class="score-team-name">${f['Home Team']}</div>
+            <div></div>
+            <div class="score-team-name">${f['Away Team']}</div>
+          </div>
+          <div class="score-inputs-row" style="margin-bottom:8px">
+            <input type="number" id="sh-${f['Match ID']}" class="score-input" min="0" max="20" placeholder="0">
+            <div class="score-dash">—</div>
+            <input type="number" id="sa-${f['Match ID']}" class="score-input" min="0" max="20" placeholder="0">
+          </div>
+          <div id="se-${f['Match ID']}" class="field-error" style="display:none;margin-bottom:6px">⚠️ Please enter a score for both teams</div>
+          <div class="scoring-guide" style="margin-bottom:10px">
+            <div class="scoring-guide-title">How points work</div>
+            <div class="scoring-row"><span>Exact score</span><span class="scoring-pts">5 pts</span></div>
+            <div class="scoring-row"><span>Correct result</span><span class="scoring-pts">2 pts</span></div>
+            <div class="scoring-row"><span>Correct goal margin</span><span class="scoring-pts">1 pt</span></div>
+            <div class="scoring-row"><span>Wrong result</span><span class="scoring-pts">0 pts</span></div>
+          </div>
+          <button class="btn-primary" onclick="submitInlinePrediction('${f['Match ID']}','${f['Home Team']}','${f['Away Team']}')" style="width:100%;padding:12px;font-size:15px">Submit prediction →</button>
+        </div>`;
+    });
+  });
+
+  container.innerHTML=html;
+  // Restore player type styling
+  switchType(currentPlayerType);
+}
+
+function toggleInline(matchId){
+  // Close all other open panels first
+  document.querySelectorAll('.predict-inline.open').forEach(el=>{
+    if(el.id!=='inline-'+matchId) el.classList.remove('open');
+  });
+  const panel=document.getElementById('inline-'+matchId);
+  if(panel){
+    panel.classList.toggle('open');
+    if(panel.classList.contains('open')){
+      // Scroll panel into view smoothly
+      setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'nearest'}),100);
+      // Reset inputs
+      document.getElementById('sh-'+matchId).value='';
+      document.getElementById('sa-'+matchId).value='';
+      document.getElementById('se-'+matchId).style.display='none';
+    }
+  }
+}
+
+function submitInlinePrediction(matchId,homeTeam,awayTeam){
+  // Validate name
+  const nameEl=document.getElementById('predict-name');
+  const nameErr=document.getElementById('predict-name-error');
+  let valid=true;
+  if(nameEl&&!nameEl.value.trim()){
+    nameEl.classList.add('error');
+    if(nameErr)nameErr.style.display='block';
+    nameEl.scrollIntoView({behavior:'smooth',block:'center'});
+    valid=false;
+  } else if(nameEl){
+    nameEl.classList.remove('error');
+    if(nameErr)nameErr.style.display='none';
+  }
+  // Validate scores
+  const h=document.getElementById('sh-'+matchId).value;
+  const a=document.getElementById('sa-'+matchId).value;
+  const scoreErr=document.getElementById('se-'+matchId);
+  if(h===''||a===''){
+    document.getElementById('sh-'+matchId).classList.add('error');
+    document.getElementById('sa-'+matchId).classList.add('error');
+    if(scoreErr)scoreErr.style.display='block';
+    valid=false;
+  } else {
+    document.getElementById('sh-'+matchId).classList.remove('error');
+    document.getElementById('sa-'+matchId).classList.remove('error');
+    if(scoreErr)scoreErr.style.display='none';
+  }
+  if(!valid)return;
+
+  // Set selected match for success screen timing
+  selectedMatch=allFixtures.find(f=>String(f['Match ID'])===String(matchId));
+
+  // Show submitted badge in panel
+  const panel=document.getElementById('inline-'+matchId);
+  if(panel){
+    panel.innerHTML=`<div class="submitted-badge">✅ Prediction submitted! ${homeTeam} ${h} — ${a} ${awayTeam}</div>`;
+  }
+  // Update match card
+  const card=document.getElementById('match-'+matchId);
+  if(card){
+    const btn=card.querySelector('.match-predict-btn');
+    if(btn)btn.remove();
+    const status=card.querySelector('.match-status');
+    if(status){status.className='match-status status-open';status.textContent='✅ Prediction submitted';}
+  }
+
+  // Show success screen after brief delay
+  setTimeout(()=>{
+    const ko=selectedMatch?parseKickoff(selectedMatch['Date'],selectedMatch['Kickoff Time']):null;
+    const now=new Date();const diff=ko?ko-now:0;
+    const mins=Math.floor(diff/60000);const hrs=Math.floor(mins/60);const rem=mins%60;
+    document.getElementById('mins-before').textContent=hrs>0?`${hrs}h ${rem}m`:`${mins} minutes`;
+    document.getElementById('tie-rating').textContent=mins>60?'excellent tiebreaker position!':mins>30?'good tiebreaker position.':'submitted just in time!';
+    const n=new Date();const hh=n.getHours();const mm=n.getMinutes().toString().padStart(2,'0');
+    document.getElementById('submit-time').textContent=`${hh%12||12}:${mm} ${hh>=12?'PM':'AM'}`;
+    scrIds.forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('active');});
+    document.getElementById('s-success').classList.add('active');
+    navIds.forEach(id=>{const el=document.getElementById(id);if(el){el.classList.remove('active');el.style.background='';el.style.color='';}});
+  },1200);
+}
+
+function submitRegistration(){
+  let valid=true;
+  const name=document.getElementById('reg-name');
+  const nameErr=document.getElementById('reg-name-error');
+  if(!name.value.trim()){name.classList.add('error');nameErr.style.display='block';valid=false;}
+  else{name.classList.remove('error');nameErr.style.display='none';}
+  const winner=document.getElementById('reg-winner');
+  const winnerErr=document.getElementById('reg-winner-error');
+  if(!winner.value){winner.classList.add('error');winnerErr.style.display='block';valid=false;}
+  else{winner.classList.remove('error');winnerErr.style.display='none';}
+  if(!valid)return;
+  scrIds.forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('active');});
+  document.getElementById('s-reg-success').classList.add('active');
+  navIds.forEach(id=>{const el=document.getElementById(id);if(el){el.classList.remove('active');el.style.background='';el.style.color='';}});
+}
+
+async function loadLeaderboard(){
+  const container=document.getElementById('lb-tournament');
+  container.innerHTML='<div class="loading">⏳ Loading standings...</div>';
+  try{
+    const res=await fetch(API+'?sheet=Leaderboard');
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const rows=await res.json();
+    const valid=rows.filter(r=>r['Full Name']&&String(r['Full Name']).trim()!==''&&String(r['Full Name'])!=='Full Name'&&String(r['Rank'])!=='Rank');
+    if(valid.length===0){
+      container.innerHTML='<div class="msg msg-neutral">No participants yet — be the first to register!</div>';
+      return;
+    }
+    const sorted=valid.sort((a,b)=>Number(b['Total Points']||0)-Number(a['Total Points']||0)).slice(0,10);
+    const medals=['🥇','🥈','🥉'];
+    container.innerHTML=sorted.map((r,i)=>{
+      const cls=i===0?'lb-row top1':i===1?'lb-row top2':i===2?'lb-row top3':'lb-row';
+      const pos=i<3?`<span class="lb-pos">${medals[i]}</span>`:`<span class="lb-pos" style="font-size:13px;color:var(--text-tertiary);font-weight:600">${i+1}</span>`;
+      return`<div class="${cls}">${pos}<div class="lb-name">${r['Full Name']}</div><div><div class="lb-pts">${r['Total Points']||0}</div><div class="lb-pts-lbl">pts</div></div></div>`;
+    }).join('');
+  }catch(e){
+    container.innerHTML='<div class="msg msg-danger">⚠️ Could not load standings. Error: '+e.message+'</div>';
+    console.error('Leaderboard error:',e);
+  }
+}
+
+function switchLb(type){
+  const t=document.getElementById('lb-t');const p=document.getElementById('lb-p');
+  const td=document.getElementById('lb-tournament');const pd=document.getElementById('lb-permatch');
+  if(type==='t'){td.style.display='block';pd.style.display='none';t.classList.add('active');p.classList.remove('active');}
+  else{pd.style.display='block';td.style.display='none';p.classList.add('active');t.classList.remove('active');}
+}
+
+function switchType(type){
+  currentPlayerType=type;
+  const g=document.getElementById('pt-guest');
+  const r=document.getElementById('pt-reg');
+  const f=document.getElementById('player-fields');
+  if(!g||!r||!f)return;
+  if(type==='guest'){
+    g.style.background='var(--gold-bg)';g.style.color='var(--gold-text)';g.style.borderColor='var(--gold-border)';
+    r.style.background='';r.style.color='';r.style.borderColor='';
+    f.innerHTML=`<div class="form-group"><label class="form-label">Your name *</label><input type="text" id="predict-name" class="form-input" placeholder="Enter your name"><div class="field-error" id="predict-name-error" style="display:none">⚠️ Please enter your name</div></div><div class="form-group"><label class="form-label">Email (optional)</label><input type="email" class="form-input" placeholder="your@email.com"><div class="email-note">📧 Add your email to receive match results and exclusive offers from The Crown Hotel</div></div>`;
+  }else{
+    r.style.background='var(--gold-bg)';r.style.color='var(--gold-text)';r.style.borderColor='var(--gold-border)';
+    g.style.background='';g.style.color='';g.style.borderColor='';
+    f.innerHTML=`<div class="form-group"><label class="form-label">Your registered name *</label><input type="text" id="predict-name" class="form-input" placeholder="Enter your registered name"><div class="field-error" id="predict-name-error" style="display:none">⚠️ Please enter your name</div></div><div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" placeholder="your@email.com"></div>`;
+  }
+}
+
+// Init
+switchType('guest');
+switchLb('t');
+loadFixtures();
+setInterval(()=>{if(allFixtures.length>0){renderTodaysMatches();findNextMatch();}},5*60*1000);
+</script>
+</body>
+</html>
