@@ -801,17 +801,17 @@ async function submitInlinePrediction(matchId, homeTeam, awayTeam) {
   const participantId = localStorage.getItem('wc2026_participantId') || '';
 
   await postToSheet({
-    action: 'predict',
-    name: playerName,
-    email: playerEmail,
-    participantId: participantId,
-    matchId: matchId,
-    homeGoals: parseInt(h),
-    awayGoals: parseInt(a),
-    venue: venueName,
-    matchday: selectedMatch ? selectedMatch['Round'] : ''
-  });
-
+  action: 'predict',
+  name: playerName,
+  email: playerEmail,
+  participantId: participantId,
+  matchId: matchId,
+  homeGoals: parseInt(h),
+  awayGoals: parseInt(a),
+  venue: venueName,
+  matchday: selectedMatch ? selectedMatch['Round'] : ''
+});
+  
   // Show inline confirmation
   const panel = document.getElementById('inline-' + matchId);
   if (panel) {
