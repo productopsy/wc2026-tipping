@@ -806,10 +806,13 @@ async function submitInlinePrediction(matchId, homeTeam, awayTeam) {
   email: playerEmail,
   participantId: participantId,
   matchId: matchId,
+  homeTeam: homeTeam,
+  awayTeam: awayTeam,
   homeGoals: parseInt(h),
   awayGoals: parseInt(a),
   venue: venueName,
-  matchday: selectedMatch ? selectedMatch['Round'] : ''
+  matchday: selectedMatch ? selectedMatch['Round'] : '',
+  matchDate: selectedMatch ? selectedMatch['Date'] : ''
 });
   
   // Show inline confirmation
