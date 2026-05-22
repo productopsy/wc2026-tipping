@@ -385,21 +385,28 @@ const API = 'https://script.google.com/macros/s/AKfycbzTJh8EdXKiNMo3EsOMBVLRglS4
 const venueName = 'The Crown Hotel';
 
 async function postToSheet(payload){
-  try{
-    const params=new URLSearchParams();
-    params.append('action','write');
-    params.append('dataAction',payload.action);
-    for(const key in payload){
-      if(key!=='action')params.append(key,String(payload[key]));
+  return new Promise((resolve) => {
+    try {
+      const params = new URLSearchParams();
+      params.append('action', 'write');
+      params.append('dataAction', payload.action);
+      for (const key in payload) {
+        if (key !== 'action') params.append(key, String(payload[key]));
+      }
+      const url = API + '?' + params.toString();
+      
+      const img = new Image();
+      img.onload = () => resolve({ success: true });
+      img.onerror = () => resolve({ success: true }); // Error = redirect = still fired
+      img.src = url;
+      
+      // Fallback after 5s regardless
+      setTimeout(() => resolve({ success: true }), 5000);
+    } catch(e) {
+      console.error('POST error:', e);
+      resolve({ success: true });
     }
-    const url=API+'?'+params.toString();
-    // Use no-cors — Apps Script receives the request even without readable response
-    await fetch(url,{mode:'no-cors'});
-    return {success:true};
-  }catch(e){
-    console.error('POST error:',e);
-    return {success:true};
-  }
+  });
 }
 
 const navIds=['n-home','n-predict','n-schedule','n-standings','n-rules'];
